@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocation, useParams } from "react-router-dom";
 import styled from "styled-components";
 
@@ -41,6 +41,18 @@ function Coin() {
   const [loading, setLoading] = useState(true);
   const { coinId } = useParams<RouteParams>();
   const { state } = useLocation<RouteState>();
+  const [info, setInfo] = useState({});
+  useEffect(() => {
+    (async () => {
+      const infoData = await (
+        await fetch(
+          `https://ohlcv-api.nomadcoders.workers.dev?coinId=${coinId}`
+        )
+      ).json();
+
+      setInfo(infoData);
+    })();
+  }, []);
   return (
     <Container>
       <Header>
