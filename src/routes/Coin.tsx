@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
-import { useLocation, useParams } from "react-router-dom";
+import { Switch, Route, useLocation, useParams } from "react-router-dom";
 import styled from "styled-components";
+import Price from "./Price";
+import Chart from "./Chart";
 
 interface RouteParams {
   coinId: string;
@@ -27,6 +29,115 @@ const Title = styled.h1`
 const Loader = styled.span`
   text-align: center;
   display: block;
+`;
+
+const Overview = styled.div`
+  display: flex;
+  justify-content: space-between;
+  background: linear-gradient(
+    135deg,
+    rgba(0, 0, 0, 0.5),
+    rgba(255, 255, 255, 0.1)
+  );
+  padding: 20px;
+  border-radius: 15px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+`;
+
+const OverviewItem = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  span:first-child {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.7);
+    letter-spacing: 1px;
+  }
+  span:last-child {
+    font-size: 16px;
+    font-weight: 700;
+    color: ${(props) => props.theme.accentColor};
+  }
+`;
+
+const Description = styled.p`
+  margin: 20px 0px;
+  text-align: left;
+  font-size: 18px;
+  font-weight: 300;
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1.6;
+`;
+
+const Tabs = styled.div`
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  margin: 25px 0px;
+  gap: 12px;
+`;
+
+const Tab = styled.span<{ isPositive?: boolean }>`
+  text-align: center;
+  text-transform: uppercase;
+  font-size: 13px;
+  font-weight: 600;
+  background: linear-gradient(
+    135deg,
+    rgba(0, 0, 0, 0.6),
+    rgba(255, 255, 255, 0.1)
+  );
+  padding: 12px 0px;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  }
+`;
+
+const PriceInfo = styled.div`
+  background: linear-gradient(
+    135deg,
+    rgba(0, 0, 0, 0.6),
+    rgba(255, 255, 255, 0.1)
+  );
+  padding: 25px;
+  border-radius: 15px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+`;
+
+const PriceItem = styled.div`
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+  &:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+  }
+
+  span:first-child {
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.7);
+    letter-spacing: 0.5px;
+  }
+
+  span:last-child {
+    font-weight: 700;
+    font-size: 14px;
+    color: ${(props) => props.theme.accentColor};
+  }
 `;
 
 interface RouteParams {
@@ -68,15 +179,73 @@ function Coin() {
       ).json();
       setInfo(infoData[0]);
       setLoading(false);
-      console.log(infoData[0]);
     })();
   }, []);
   return (
     <Container>
       <Header>
-        <Title>{state?.name || "Loading..."}</Title>
+        <Title>
+          {state?.name ? state.name : loading ? "Loading..." : info?.name}
+        </Title>
       </Header>
-      {loading ? <Loader>Loading...</Loader> : null}
+      {loading ? (
+        <Loader>Loading...</Loader>
+      ) : (
+        <>
+          <Overview>
+            <OverviewItem>
+              <span>Rank:</span>
+              <span>{info?.rank}</span>
+            </OverviewItem>
+            <OverviewItem>
+              <span>Symbol:</span>
+              <span>${info?.symbol}</span>
+            </OverviewItem>
+            <OverviewItem>
+              <span>Price:</span>
+              <span>${info?.price_usd}</span>
+            </OverviewItem>
+          </Overview>
+          <Switch>
+            <Route path={`/${coinId}/price`}>
+              <Price />
+            </Route>
+            <Route path={`/${coinId}/chart`}>
+              <Chart />
+            </Route>
+          </Switch>
+
+          <PriceInfo>
+            <PriceItem>
+              <span>Market Cap:</span>
+              <span>${info?.market_cap_usd}</span>
+            </PriceItem>
+            <PriceItem>
+              <span>24h Volume:</span>
+              <span>${info?.volume24?.toLocaleString()}</span>
+            </PriceItem>
+            <PriceItem>
+              <span>Circulating Supply:</span>
+              <span>{info?.csupply}</span>
+            </PriceItem>
+            <PriceItem>
+              <span>Total Supply:</span>
+              <span>{info?.tsupply}</span>
+            </PriceItem>
+            <PriceItem>
+              <span>Max Supply:</span>
+              <span>{info?.msupply}</span>
+            </PriceItem>
+          </PriceInfo>
+
+          <Tabs>
+            <Tab>1h: {info?.percent_change_1h}%</Tab>
+            <Tab>24h: {info?.percent_change_24h}%</Tab>
+            <Tab>7d: {info?.percent_change_7d}%</Tab>
+            <Tab>Price in BTC: {info?.price_btc}</Tab>
+          </Tabs>
+        </>
+      )}
     </Container>
   );
 }
