@@ -37,20 +37,38 @@ interface RouteState {
   name: string;
 }
 
+interface InfoData {
+  id: string;
+  symbol: string;
+  name: string;
+  nameid: string;
+  rank: number;
+  price_usd: string;
+  percent_change_24h: string;
+  percent_change_1h: string;
+  percent_change_7d: string;
+  price_btc: string;
+  market_cap_usd: string;
+  volume24: number;
+  volume24a: number;
+  csupply: string;
+  tsupply: string;
+  msupply: string;
+}
+
 function Coin() {
   const [loading, setLoading] = useState(true);
   const { coinId } = useParams<RouteParams>();
   const { state } = useLocation<RouteState>();
-  const [info, setInfo] = useState({});
+  const [info, setInfo] = useState<InfoData>();
   useEffect(() => {
     (async () => {
       const infoData = await (
-        await fetch(
-          `https://ohlcv-api.nomadcoders.workers.dev?coinId=${coinId}`
-        )
+        await fetch(`https://api.coinlore.net/api/ticker/?id=${coinId}`)
       ).json();
-
-      setInfo(infoData);
+      setInfo(infoData[0]);
+      setLoading(false);
+      console.log(infoData[0]);
     })();
   }, []);
   return (

@@ -57,9 +57,6 @@ interface CoinInterface {
   name: string;
   symbol: string;
   rank: number;
-  is_new: boolean;
-  is_active: boolean;
-  type: string;
 }
 
 function Coins() {
@@ -67,9 +64,9 @@ function Coins() {
   const [loading, setLoading] = useState(true);
   useEffect(() => {
     (async () => {
-      const response = fetch("https://api.coinpaprika.com/v1/coins");
+      const response = fetch("https://api.coinlore.net/api/tickers/");
       const json = await (await response).json();
-      setCoins(json.slice(0, 100));
+      setCoins(json.data.slice(0, 100));
       setLoading(false);
     })();
   }, []);
