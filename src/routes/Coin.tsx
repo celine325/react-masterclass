@@ -1,5 +1,12 @@
 import { useEffect, useState } from "react";
-import { Switch, Route, useLocation, useParams } from "react-router-dom";
+import {
+  Switch,
+  Route,
+  useLocation,
+  useParams,
+  Link,
+  useRouteMatch,
+} from "react-router-dom";
 import styled from "styled-components";
 import Price from "./Price";
 import Chart from "./Chart";
@@ -80,7 +87,48 @@ const Tabs = styled.div`
   gap: 12px;
 `;
 
-const Tab = styled.span<{ isPositive?: boolean }>`
+const Tab = styled.span<{ isActive: boolean }>`
+  text-align: center;
+  text-transform: uppercase;
+  font-size: 13px;
+  font-weight: 600;
+  background: linear-gradient(
+    135deg,
+    rgba(0, 0, 0, 0.6),
+    rgba(255, 255, 255, 0.1)
+  );
+  padding: 12px 0px;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  color: ${(props) =>
+    props.isActive ? props.theme.accentColor : "rgba(255, 255, 255, 0.7)"};
+  border: 2px solid
+    ${(props) =>
+      props.isActive ? props.theme.accentColor : "transparent"};
+
+  a {
+    display: block;
+    width: 100%;
+    height: 100%;
+    color: inherit;
+    text-decoration: none;
+  }
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  }
+`;
+
+const StatTabs = styled.div`
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  margin: 25px 0px;
+  gap: 12px;
+`;
+
+const StatTab = styled.span`
   text-align: center;
   text-transform: uppercase;
   font-size: 13px;
@@ -172,6 +220,8 @@ function Coin() {
   const { coinId } = useParams<RouteParams>();
   const { state } = useLocation<RouteState>();
   const [info, setInfo] = useState<InfoData>();
+  const priceMatch = useRouteMatch("/:coinId/price");
+  const chartMatch = useRouteMatch("/:coinId/chart");
   useEffect(() => {
     (async () => {
       const infoData = await (
@@ -206,11 +256,21 @@ function Coin() {
               <span>${info?.price_usd}</span>
             </OverviewItem>
           </Overview>
+
+          <Tabs>
+            <Tab isActive={priceMatch !== null}>
+              <Link to={`/${coinId}/price`}>Price</Link>
+            </Tab>
+            <Tab isActive={chartMatch !== null}>
+              <Link to={`/${coinId}/chart`}>Chart</Link>
+            </Tab>
+          </Tabs>
+
           <Switch>
-            <Route path={`/${coinId}/price`}>
+            <Route path={`/:coinId/price`}>
               <Price />
             </Route>
-            <Route path={`/${coinId}/chart`}>
+            <Route path={`/:coinId/chart`}>
               <Chart />
             </Route>
           </Switch>
@@ -238,12 +298,12 @@ function Coin() {
             </PriceItem>
           </PriceInfo>
 
-          <Tabs>
-            <Tab>1h: {info?.percent_change_1h}%</Tab>
-            <Tab>24h: {info?.percent_change_24h}%</Tab>
-            <Tab>7d: {info?.percent_change_7d}%</Tab>
-            <Tab>Price in BTC: {info?.price_btc}</Tab>
-          </Tabs>
+          <StatTabs>
+            <StatTab>1h: {info?.percent_change_1h}%</StatTab>
+            <StatTab>24h: {info?.percent_change_24h}%</StatTab>
+            <StatTab>7d: {info?.percent_change_7d}%</StatTab>
+            <StatTab>Price in BTC: {info?.price_btc}</StatTab>
+          </StatTabs>
         </>
       )}
     </Container>
