@@ -1,5 +1,11 @@
+const BASE_URL = "https://api.coinlore.net/api";
+
 export function fetchCoins() {
-  return fetch("https://api.coinlore.net/api/tickers/").then((response) =>
+  return fetch(`${BASE_URL}/tickers/`).then((response) => response.json());
+}
+
+export function fetchCoinInfo(coinId: string) {
+  return fetch(`${BASE_URL}/ticker/?id=${coinId}`).then((response) =>
     response.json()
   );
 }

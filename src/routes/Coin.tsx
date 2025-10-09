@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import {
   Switch,
   Route,
@@ -10,6 +9,8 @@ import {
 import styled from "styled-components";
 import Price from "./Price";
 import Chart from "./Chart";
+import { useQuery } from "@tanstack/react-query";
+import { fetchCoinInfo } from "../api";
 
 interface RouteParams {
   coinId: string;
@@ -148,29 +149,25 @@ interface InfoData {
 }
 
 function Coin() {
-  const [loading, setLoading] = useState(true);
   const { coinId } = useParams<RouteParams>();
   const { state } = useLocation<RouteState>();
-  const [info, setInfo] = useState<InfoData>();
   const priceMatch = useRouteMatch("/:coinId/price");
   const chartMatch = useRouteMatch("/:coinId/chart");
-  useEffect(() => {
-    (async () => {
-      const infoData = await (
-        await fetch(`https://api.coinlore.net/api/ticker/?id=${coinId}`)
-      ).json();
-      setInfo(infoData[0]);
-      setLoading(false);
-    })();
-  }, []);
+
+  const { isLoading, data } = useQuery<InfoData[]>({
+    queryKey: ["info", coinId],
+    queryFn: () => fetchCoinInfo(coinId!),
+  });
+
+  const info = data?.[0];
   return (
     <Container>
       <Header>
         <Title>
-          {state?.name ? state.name : loading ? "Loading..." : info?.name}
+          {state?.name ? state.name : isLoading ? "Loading..." : info?.name}
         </Title>
       </Header>
-      {loading ? (
+      {isLoading ? (
         <Loader>Loading...</Loader>
       ) : (
         <>
