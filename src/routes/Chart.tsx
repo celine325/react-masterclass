@@ -1,6 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { fetchCoinHistory } from "../api";
 import styled from "styled-components";
+import ApexChart from "react-apexcharts";
+import { useTheme } from "styled-components";
 
 const ChartContainer = styled.div`
   background: linear-gradient(
@@ -19,29 +21,16 @@ const ChartTitle = styled.h2`
   font-size: 20px;
   font-weight: 600;
   color: ${(props) => props.theme.accentColor};
-  margin-bottom: 20px;
-`;
-
-const DataList = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-`;
-
-const DataItem = styled.div`
-  display: flex;
-  justify-content: space-between;
-  padding: 10px;
-  background: rgba(0, 0, 0, 0.3);
-  border-radius: 8px;
-  font-size: 12px;
+  margin-bottom: 30px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
 `;
 
 interface ChartProps {
   coinId: string;
 }
 
-interface OHLCVData {
+interface IHistorical {
   time_open: number;
   time_close: number;
   open: string;
@@ -53,7 +42,8 @@ interface OHLCVData {
 }
 
 function Chart({ coinId }: ChartProps) {
-  const { isLoading, data } = useQuery<OHLCVData[]>({
+  const theme = useTheme();
+  const { isLoading, data } = useQuery<IHistorical[]>({
     queryKey: ["ohlcv", coinId],
     queryFn: () => fetchCoinHistory(coinId),
   });
@@ -79,20 +69,61 @@ function Chart({ coinId }: ChartProps) {
 
   return (
     <ChartContainer>
-      <ChartTitle>Price History (OHLCV)</ChartTitle>
-      <DataList>
-        {data.slice(0, 10).map((item, index) => (
-          <DataItem key={index}>
-            <span>{new Date(item.time_open * 1000).toLocaleDateString()}</span>
-            <span>
-              O: ${parseFloat(item.open).toFixed(2)} | H: $
-              {parseFloat(item.high).toFixed(2)} | L: $
-              {parseFloat(item.low).toFixed(2)} | C: $
-              {parseFloat(item.close).toFixed(2)}
-            </span>
-          </DataItem>
-        ))}
-      </DataList>
+      <ChartTitle>Price Chart</ChartTitle>
+      <ApexChart
+        type="line"
+        series={[
+          {
+            name: "Price",
+            data: data?.map((price) => parseFloat(price.close)) ?? [],
+          },
+        ]}
+        options={{
+          theme: {
+            mode: "dark",
+          },
+          chart: {
+            height: 300,
+            width: 500,
+            toolbar: {
+              show: false,
+            },
+            background: "transparent",
+          },
+          grid: {
+            show: false,
+          },
+          stroke: {
+            curve: "smooth",
+            width: 3,
+            colors: [theme.accentColor],
+          },
+          yaxis: {
+            show: false,
+          },
+          xaxis: {
+            axisBorder: { show: false },
+            axisTicks: { show: false },
+            labels: { show: false },
+            type: "datetime",
+            categories: data?.map((price) => price.time_close * 1000),
+          },
+          fill: {
+            type: "gradient",
+            gradient: {
+              gradientToColors: [theme.accentColor],
+              stops: [0, 100],
+            },
+          },
+          colors: [theme.accentColor],
+          tooltip: {
+            y: {
+              formatter: (value) => `$${value.toFixed(2)}`,
+            },
+            theme: "dark",
+          },
+        }}
+      />
     </ChartContainer>
   );
 }
