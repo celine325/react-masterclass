@@ -24,11 +24,10 @@ interface PriceProps {
 }
 
 const PriceInfo = styled.div`
-  background: linear-gradient(
-    135deg,
-    rgba(0, 0, 0, 0.6),
-    rgba(255, 255, 255, 0.1)
-  );
+  background: ${(props) =>
+    props.theme.bgColor === "#2f3640"
+      ? "linear-gradient(135deg, rgba(0, 0, 0, 0.5), rgba(255, 255, 255, 0.1))"
+      : "linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(0, 0, 0, 0.05))"};
   padding: 25px;
   border-radius: 15px;
   margin-bottom: 20px;
@@ -51,7 +50,7 @@ const PriceItem = styled.div`
     font-weight: 600;
     text-transform: uppercase;
     font-size: 12px;
-    color: rgba(255, 255, 255, 0.7);
+    color: ${(props) => props.theme.textColor};
     letter-spacing: 0.5px;
   }
 
@@ -74,11 +73,10 @@ const StatTab = styled.span`
   text-transform: uppercase;
   font-size: 13px;
   font-weight: 600;
-  background: linear-gradient(
-    135deg,
-    rgba(0, 0, 0, 0.6),
-    rgba(255, 255, 255, 0.1)
-  );
+  background: ${(props) =>
+    props.theme.bgColor === "#2f3640"
+      ? "linear-gradient(135deg, rgba(0, 0, 0, 0.5), rgba(255, 255, 255, 0.1))"
+      : "linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(0, 0, 0, 0.05))"};
   padding: 12px 0px;
   border-radius: 12px;
   transition: all 0.3s ease;

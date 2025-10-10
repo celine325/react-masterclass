@@ -27,6 +27,48 @@ const Header = styled.header`
   display: flex;
   justify-content: center;
   align-items: center;
+  position: relative;
+`;
+
+const BackButton = styled.div`
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: ${(props) => props.theme.textColor};
+  background: ${(props) =>
+    props.theme.bgColor === "#2f3640"
+      ? "rgba(0, 0, 0, 0.5)"
+      : "rgba(255, 255, 255, 0.9)"};
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+
+  &:hover {
+    color: ${(props) => props.theme.accentColor};
+    transform: scale(1.1);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+
+  a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: inherit;
+    text-decoration: none;
+    width: 100%;
+    height: 100%;
+  }
 `;
 
 const Title = styled.h1`
@@ -42,11 +84,10 @@ const Loader = styled.span`
 const Overview = styled.div`
   display: flex;
   justify-content: space-between;
-  background: linear-gradient(
-    135deg,
-    rgba(0, 0, 0, 0.5),
-    rgba(255, 255, 255, 0.1)
-  );
+  background: ${(props) =>
+    props.theme.bgColor === "#2f3640"
+      ? "linear-gradient(135deg, rgba(0, 0, 0, 0.5), rgba(255, 255, 255, 0.1))"
+      : "linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(0, 0, 0, 0.05))"};
   padding: 20px;
   border-radius: 15px;
   margin-bottom: 20px;
@@ -62,7 +103,10 @@ const OverviewItem = styled.div`
     font-size: 11px;
     font-weight: 600;
     text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.7);
+    color: ${(props) =>
+      props.theme.bgColor === "#2f3640"
+        ? "rgba(255, 255, 255, 0.7)"
+        : "rgba(0, 0, 0, 0.6)"};
     letter-spacing: 1px;
   }
   span:last-child {
@@ -93,16 +137,19 @@ const Tab = styled.span<{ isActive: boolean }>`
   text-transform: uppercase;
   font-size: 13px;
   font-weight: 600;
-  background: linear-gradient(
-    135deg,
-    rgba(0, 0, 0, 0.6),
-    rgba(255, 255, 255, 0.1)
-  );
+  background: ${(props) =>
+    props.theme.bgColor === "#2f3640"
+      ? "linear-gradient(135deg, rgba(0, 0, 0, 0.6), rgba(255, 255, 255, 0.1))"
+      : "linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(0, 0, 0, 0.05))"};
   border-radius: 12px;
   transition: all 0.3s ease;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   color: ${(props) =>
-    props.isActive ? props.theme.accentColor : "rgba(255, 255, 255, 0.7)"};
+    props.isActive
+      ? props.theme.accentColor
+      : props.theme.bgColor === "#2f3640"
+      ? "rgba(255, 255, 255, 0.7)"
+      : "rgba(0, 0, 0, 0.6)"};
   border: 2px solid
     ${(props) => (props.isActive ? props.theme.accentColor : "transparent")};
 
@@ -162,6 +209,9 @@ function Coin() {
   const info = data?.[0];
   return (
     <Container>
+      <BackButton>
+        <Link to="/">←</Link>
+      </BackButton>
       <Header>
         <Title>
           {state?.name ? state.name : isLoading ? "Loading..." : info?.name}

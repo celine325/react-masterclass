@@ -2,7 +2,11 @@ import { BrowserRouter, Route, Switch } from "react-router-dom";
 import Coins from "./routes/Coins";
 import Coin from "./routes/Coin";
 
-function Router() {
+interface RouterProps {
+  toggleTheme: () => void;
+}
+
+function Router({ toggleTheme }: RouterProps) {
   return (
     <BrowserRouter>
       <Switch>
@@ -10,7 +14,7 @@ function Router() {
           <Coin />
         </Route>
         <Route path="/">
-          <Coins />
+          <Coins toggleTheme={toggleTheme} />
         </Route>
       </Switch>
     </BrowserRouter>

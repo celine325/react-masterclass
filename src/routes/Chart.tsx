@@ -5,25 +5,14 @@ import ApexChart from "react-apexcharts";
 import { useTheme } from "styled-components";
 
 const ChartContainer = styled.div`
-  background: linear-gradient(
-    135deg,
-    rgba(0, 0, 0, 0.6),
-    rgba(255, 255, 255, 0.1)
-  );
+  background: ${(props) =>
+    props.theme.bgColor === "#2f3640"
+      ? "linear-gradient(135deg, rgba(0, 0, 0, 0.5), rgba(255, 255, 255, 0.1))"
+      : "linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(0, 0, 0, 0.05))"};
   padding: 25px;
   border-radius: 15px;
   margin: 20px 0px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-`;
-
-const ChartTitle = styled.h2`
-  text-align: center;
-  font-size: 20px;
-  font-weight: 600;
-  color: ${(props) => props.theme.accentColor};
-  margin-bottom: 30px;
-  text-transform: uppercase;
-  letter-spacing: 2px;
 `;
 
 interface ChartProps {
@@ -51,31 +40,27 @@ function Chart({ coinId }: ChartProps) {
   if (isLoading) {
     return (
       <ChartContainer>
-        <ChartTitle>Loading chart data...</ChartTitle>
-      </ChartContainer>
-    );
-  }
-
-  if (!data || data.length === 0) {
-    return (
-      <ChartContainer>
-        <ChartTitle>Chart</ChartTitle>
-        <p style={{ textAlign: "center", color: "rgba(255, 255, 255, 0.7)" }}>
-          No historical data available for this coin.
-        </p>
+        <p>Loading Chart...</p>
       </ChartContainer>
     );
   }
 
   return (
     <ChartContainer>
-      <ChartTitle>Price Chart</ChartTitle>
       <ApexChart
-        type="line"
+        type="candlestick"
         series={[
           {
-            name: "Price",
-            data: data?.map((price) => parseFloat(price.close)) ?? [],
+            data:
+              data?.map((price) => ({
+                x: new Date(price.time_close * 1000),
+                y: [
+                  parseFloat(price.open),
+                  parseFloat(price.high),
+                  parseFloat(price.low),
+                  parseFloat(price.close),
+                ],
+              })) ?? [],
           },
         ]}
         options={{
@@ -83,44 +68,56 @@ function Chart({ coinId }: ChartProps) {
             mode: "dark",
           },
           chart: {
-            height: 300,
-            width: 500,
+            type: "candlestick",
+            height: 350,
             toolbar: {
               show: false,
             },
             background: "transparent",
           },
           grid: {
-            show: false,
-          },
-          stroke: {
-            curve: "smooth",
-            width: 3,
-            colors: [theme.accentColor],
+            borderColor: "rgba(255, 255, 255, 0.1)",
+            strokeDashArray: 4,
           },
           yaxis: {
-            show: false,
+            show: true,
+            labels: {
+              style: {
+                colors: theme.textColor,
+              },
+              formatter: (value) => `$${value.toFixed(0)}`,
+            },
           },
           xaxis: {
-            axisBorder: { show: false },
-            axisTicks: { show: false },
-            labels: { show: false },
             type: "datetime",
-            categories: data?.map((price) => price.time_close * 1000),
-          },
-          fill: {
-            type: "gradient",
-            gradient: {
-              gradientToColors: [theme.accentColor],
-              stops: [0, 100],
+            labels: {
+              style: {
+                colors: theme.textColor,
+              },
+              datetimeFormatter: {
+                year: "yyyy",
+                month: "MMM 'yy",
+                day: "dd MMM",
+                hour: "HH:mm",
+              },
             },
           },
-          colors: [theme.accentColor],
+          plotOptions: {
+            candlestick: {
+              colors: {
+                upward: theme.accentColor,
+                downward: "#ef4444",
+              },
+              wick: {
+                useFillColor: true,
+              },
+            },
+          },
           tooltip: {
-            y: {
-              formatter: (value) => `$${value.toFixed(2)}`,
-            },
             theme: "dark",
+            x: {
+              format: "dd MMM yyyy HH:mm",
+            },
           },
         }}
       />

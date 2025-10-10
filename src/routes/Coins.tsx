@@ -8,6 +8,45 @@ const Container = styled.div`
   padding: 0px 20px;
   max-width: 480px;
   margin: 0 auto;
+  position: relative;
+`;
+
+const ThemeToggle = styled.button`
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  width: 60px;
+  height: 30px;
+  background: ${(props) =>
+    props.theme.bgColor === "#2f3640" ? "#4cd137" : "#8c7ae6"};
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  padding: 3px;
+  z-index: 1000;
+
+  &::after {
+    content: "";
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: white;
+    top: 3px;
+    left: ${(props) => (props.theme.bgColor === "#2f3640" ? "3px" : "33px")};
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+
+  &:hover {
+    transform: scale(1.05);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
 `;
 
 const Header = styled.header`
@@ -15,13 +54,16 @@ const Header = styled.header`
   display: flex;
   justify-content: center;
   align-items: center;
+  position: relative;
 `;
 
 const CoinList = styled.ul``;
 
 const Coin = styled.li`
-  background-color: white;
-  color: ${(props) => props.theme.bgColor};
+  background-color: ${(props) =>
+    props.theme.bgColor === "#2f3640" ? "white" : "#2f3640"};
+  color: ${(props) =>
+    props.theme.bgColor === "#2f3640" ? "#2f3640" : "white"};
   margin-bottom: 10px;
 
   border-radius: 15px;
@@ -61,7 +103,11 @@ interface ICoin {
   rank: number;
 }
 
-function Coins() {
+interface CoinsProps {
+  toggleTheme: () => void;
+}
+
+function Coins({ toggleTheme }: CoinsProps) {
   const { isLoading, data } = useQuery<{ data: ICoin[] }>({
     queryKey: ["allCoins"],
     queryFn: fetchCoins,
@@ -69,6 +115,7 @@ function Coins() {
 
   return (
     <Container>
+      <ThemeToggle onClick={toggleTheme} aria-label="Toggle theme" />
       <Header>
         <Title>Coin</Title>
       </Header>
