@@ -1,29 +1,38 @@
 import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
 import { useForm } from "react-hook-form";
-import { toDoAtom } from "../atoms";
+import { toDoAtom, toDoSelector } from "../atoms";
 import CreateToDo from "./CreateToDo";
 import ToDo from "./ToDo";
 
-/*
-export const addToDoAtom = atom(null, (get, set, text: string) => {
-  const prev = get(toDoAtom);
-  set(toDoAtom, [{ text, category: "TO_DO" }, ...prev]);
-});
-*/
-
 function ToDoList() {
-  const toDos = useAtomValue(toDoAtom);
+  const [toDo, doing, done] = useAtomValue(toDoSelector);
 
   return (
     <div>
       <h1>To Dos</h1>
       <hr />
       <CreateToDo />
+      <h2>To Do</h2>
       <ul>
-        {toDos.map((toDo) => (
+        {toDo.map((toDo) => (
           <ToDo key={toDo.id} {...toDo} />
         ))}
       </ul>
+      <hr />
+      <h2>Doing</h2>
+      <ul>
+        {doing.map((toDo) => (
+          <ToDo key={toDo.id} {...toDo} />
+        ))}
+      </ul>
+      <hr />
+      <h2>Done</h2>
+      <ul>
+        {done.map((toDo) => (
+          <ToDo key={toDo.id} {...toDo} />
+        ))}
+      </ul>
+      <hr />
     </div>
   );
 }
