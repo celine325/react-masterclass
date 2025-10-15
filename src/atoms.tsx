@@ -3,18 +3,17 @@ import { atom } from "jotai";
 export interface IToDo {
   text: string;
   id: number;
-  category: Category;
+  category: CategoryList;
 }
 
 export const toDoAtom = atom<IToDo[]>([]);
 
-type Category = "TO_DO" | "DOING" | "DONE";
+export type CategoryList = "TO_DO" | "DOING" | "DONE";
+
+export const categoryAtom = atom<CategoryList>("TO_DO");
 
 export const toDoSelector = atom((get) => {
   const toDos = get(toDoAtom);
-  return [
-    toDos.filter((t) => t.category === "TO_DO"),
-    toDos.filter((t) => t.category === "DOING"),
-    toDos.filter((t) => t.category === "DONE"),
-  ] as const;
+  const category = get(categoryAtom);
+  return toDos.filter((toDo) => toDo.category === category);
 });
