@@ -18,6 +18,7 @@ const routes: RouteObject[] = [
       { index: true, element: <Home /> },
       { path: "search", element: <Search /> },
       { path: "tv", element: <Tv /> },
+      { path: "movies/:movieId" },
     ],
   },
 ];
